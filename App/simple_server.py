@@ -4,13 +4,13 @@ app = FastAPI()
 db = [
     {
         'id': 1,
-        'name': "Salchicha",
+        'name': "Prueba 1",
         'price': 5.9,
         'image': "img.png"
     },
     {
         'id': 2,
-        'name': "Soda",
+        'name': "Prueba 2",
         'price': 10.9,
         'image': "img1.png"
     },
