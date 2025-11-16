@@ -37,9 +37,7 @@ class UIApp(ft.Container):
 
         # Referencia para controlar el scroll de la lista de categorías
         self.category_list_ref = ft.Ref[ft.ListView]()
-
-        # Inicializamos la posición de scroll en 0
-        self.current_scroll_offset = 0 # <--- AÑADE ESTA LÍNEA
+        self.current_scroll_offset = 0
 
         # -- Grafica: Curva de demanda y oferta --
         x_values = list(range(1,16))

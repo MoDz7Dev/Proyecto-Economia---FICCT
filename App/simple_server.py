@@ -12,7 +12,7 @@ db = [
         'id': 2,
         'name': "Prueba 2",
         'price': 10.9,
-        'image': "img1.png"
+        'image': "\products\img6.png"
     },
     {
         'id': 3,
