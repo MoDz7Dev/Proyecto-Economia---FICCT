@@ -122,12 +122,39 @@ class UIApp(ft.Container):
 
         products = []
         
+        # --- Lista de Productos: Inventario ---- 
+        #? Es necesario correr el servidor local "simple_server.py"
         for product in getProducts():
-            products.append(ft.Container( bgcolor=self.container_color, border_radius=10, content=ft.Column([
-                ft.Image(product['image']),
-                ft.Text(product['name']),
-                ft.Text(product['price'])
-            ],alignment=ft.MainAxisAlignment.CENTER)))
+            products.append(ft.Container(aspect_ratio=1.5,bgcolor=self.container_color, border_radius=10, content=ft.Column([
+                ft.Container(content=ft.Image(product['image'], width=page.window.width/3, fit=ft.ImageFit.COVER), expand=1),
+                ft.Container(
+                    padding=ft.padding.only(left=10, right=10, bottom=10), 
+                    content=ft.Column([
+                        # Título del producto
+                        ft.Text(
+                            product['name'], 
+                            color="white", 
+                            weight="bold",
+                            size=15,
+                            text_align=ft.TextAlign.CENTER,
+                            max_lines=2,
+                            overflow=ft.TextOverflow.ELLIPSIS, 
+                            expand=True, 
+                        ),
+                        # Precios
+                        ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                               controls=[
+                                   ft.Text(f"Bs.{product['saleprice']}", color="white",text_align=ft.TextAlign.CENTER),
+                                   ft.Text(f"Bs.{product['purchaseprice']}", color=self.color_purple,text_align=ft.TextAlign.CENTER),
+                               ]
+                        ),
+                        # Botón
+                        ft.FilledButton("Detalles", bgcolor=self.color_purple, expand=True,width=130)
+                    ], 
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,height=121
+                    )   
+                )
+            ])))
         
         # --- Menú de Notificaciones Flotante ---
         self.notifications_popup = ft.Container(
@@ -894,7 +921,13 @@ class UIApp(ft.Container):
                                     ],
                                 ),
                                 ft.Divider(height=1),
-                                ft.ListView(expand=True),
+                                ft.ListView(expand=True, controls=[
+                                    ft.Column([
+                                        ft.Row([
+                                            #! FALTA LISTA DE COMPRA
+                                        ])                                         
+                                    ])
+                                ]),
                                 ft.Container(
                                     padding=10,height=210,
                                     content=ft.Column(
