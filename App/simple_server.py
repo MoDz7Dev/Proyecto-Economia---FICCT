@@ -60,73 +60,73 @@ db = [
     },
     {
         'id': 9,
-        'name': "product 10",
+        'name': "Lavavajilla Todo Brillo Limon Verde Doypack",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img5.png"
+        'image': "\products\img9.png"
     },
     {
         'id': 10,
-        'name': "product 11",
+        'name': "Detergente Polvo Omo Limon 4.8 kg",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img3.png"
+        'image': "\products\img10.png"
     },
     {
         'id': 11,
-        'name': "product 12",
+        'name': "Pinza Ropa Rey Gigante 24 un",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img3.png"
+        'image': "\products\img11.png"
     },
     {
         'id': 12,
-        'name': "product 13",
+        'name': "Lavandina Sapolio 1 L",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img5.png"
+        'image': "\products\img12.png"
     },
     {
         'id': 13,
-        'name': "product 14",
+        'name': "Lapices de Colores Faber Castell 12 Colores + 2 Lapices",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img1.png"
+        'image': "\products\img13.png"
     },
     {
         'id': 14,
-        'name': "product 15",
+        'name': "Cartulina Blanca Pliego",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img3.png"
+        'image': "\products\img14.png"
     },
     {
         'id': 15,
-        'name': "product 16",
+        'name': "Acrilex Opaco Surtido",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img5.png"
+        'image': "\products\img15.png"
     },
     {
         'id': 16,
-        'name': "product 80",
+        'name': "Cartulina Oficio 10 un",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img2.png"
+        'image': "\products\img16.png"
     },
     {
         'id': 17,
-        'name': "product 15",
+        'name': "Hoja Papel Bond Chamex Carta 500 Hojas",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img1.png"
+        'image': "\products\img17.png"
     },
     {
         'id': 18,
-        'name': "product 17",
+        'name': "Libro Infantil Lexus",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "img4.png"
+        'image': "\products\img18.png"
     }
 ]
 

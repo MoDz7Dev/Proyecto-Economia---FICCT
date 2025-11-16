@@ -924,9 +924,46 @@ class UIApp(ft.Container):
                                 ft.ListView(expand=True, controls=[
                                     ft.Column([
                                         ft.Row([
-                                            #! FALTA LISTA DE COMPRA
-                                        ])                                         
-                                    ])
+                                            ft.Image("\products\img16.png", width=50, height=50),
+                                            ft.Column([
+                                                ft.Text("Cartulina Oficio", color="white"),
+                                                ft.Text("Precio: Bs.38.00", color=self.color_purple)
+                                            ]),
+                                            ft.Text("Bs.114.00", color=self.color_purple, size=20, weight="bold")
+                                        ]),
+                                        ft.Row([
+                                            ft.Row([
+                                                ft.IconButton(icon=ft.Icons.REMOVE, icon_color="white"),
+                                                ft.Container(border_radius=3,width=40,height=25,bgcolor=self.bg_color,content=ft.Row([
+                                                    ft.Text(5,color="white")
+                                                ], alignment=ft.MainAxisAlignment.CENTER)),
+                                                ft.IconButton(icon=ft.Icons.ADD, icon_color="white")
+                                            ]),
+                                            ft.IconButton(icon=ft.Icons.DELETE, icon_color="white")
+                                        ],alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                                         
+                                    ]),
+                                    ft.Divider(height=1),
+                                    ft.Column([
+                                        ft.Row([
+                                            ft.Image("\products\img13.png", width=50, height=50),
+                                            ft.Column([
+                                                ft.Text("Lapices Faber Castell", color="white"),
+                                                ft.Text("Precio: Bs.10.00", color=self.color_purple)
+                                            ]),
+                                            ft.Text("Bs.40.00", color=self.color_purple, size=20, weight="bold")
+                                        ]),
+                                        ft.Row([
+                                            ft.Row([
+                                                ft.IconButton(icon=ft.Icons.REMOVE, icon_color="white"),
+                                                ft.Container(border_radius=3,width=40,height=25,bgcolor=self.bg_color,content=ft.Row([
+                                                    ft.Text(5,color="white")
+                                                ], alignment=ft.MainAxisAlignment.CENTER)),
+                                                ft.IconButton(icon=ft.Icons.ADD, icon_color="white")
+                                            ]),
+                                            ft.IconButton(icon=ft.Icons.DELETE, icon_color="white")
+                                        ],alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                                         
+                                    ]),
+
                                 ]),
                                 ft.Container(
                                     padding=10,height=210,
