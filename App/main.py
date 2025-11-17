@@ -22,9 +22,9 @@ class UIApp(ft.Container):
         #Definimos paleta de colores
         self.color_blue = "#73bf16"
         self.color_purple = "#cf672b"
-        self.bg_color = "#3d355f"
-        self.container_color = "#362e57"
-        self.color_navegation_bt = "#2a2949"
+        self.bg_color = "#21324e"
+        self.container_color = "#1c2b45"
+        self.color_navegation_bt = "#21324e"
         self.color1_card = "#e3501b"
         self.color2_card = "#d6820c"
 
