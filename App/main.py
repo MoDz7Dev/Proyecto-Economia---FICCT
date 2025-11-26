@@ -1200,16 +1200,13 @@ class UIApp(ft.Container):
         }
 
         #Pagina: Distribuye la interfaz en dos partes
-        self.page.add(
-            ft.Row(
-                expand=True,
-                spacing=5,
-                controls=[
-                    self.navegation,
-                    self.main_content,
-                ]
-
-            )
+        self.content = ft.Row(
+            expand=True,
+            spacing=5,
+            controls=[
+                self.navegation,
+                self.main_content,
+            ]
         )
     
     # Metodo para ocultar o mostrar las lineas del grafico
@@ -1335,4 +1332,4 @@ class UIApp(ft.Container):
 
 #Arrancamos el programa y indicamos que se ejecute la clase "UIAPP" para mostrar la interfaz
 #? "assets_dir = assets" se usa para indicar en que carpeta se buscara imagenes, etc
-ft.app(target=lambda page:UIApp(page), assets_dir="assets")
+#ft.app(target=lambda page:UIApp(page), assets_dir="assets")
