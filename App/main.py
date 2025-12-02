@@ -125,36 +125,55 @@ class UIApp(ft.Container):
         # --- Lista de Productos: Inventario ---- 
         #? Es necesario correr el servidor local "simple_server.py"
         for product in getProducts():
-            products.append(ft.Container(aspect_ratio=1.5,bgcolor=self.container_color, border_radius=10, content=ft.Column([
-                ft.Container(content=ft.Image(product['image'], width=page.window.width/3, fit=ft.ImageFit.COVER), expand=1),
+            products.append(
                 ft.Container(
-                    padding=ft.padding.only(left=10, right=10, bottom=10), 
-                    content=ft.Column([
-                        # Título del producto
-                        ft.Text(
-                            product['name'], 
-                            color="white", 
-                            weight="bold",
-                            size=15,
-                            text_align=ft.TextAlign.CENTER,
-                            max_lines=2,
-                            overflow=ft.TextOverflow.ELLIPSIS, 
-                            expand=True, 
-                        ),
-                        # Precios
-                        ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                               controls=[
-                                   ft.Text(f"Bs.{product['saleprice']}", color="white",text_align=ft.TextAlign.CENTER),
-                                   ft.Text(f"Bs.{product['purchaseprice']}", color=self.color_purple,text_align=ft.TextAlign.CENTER),
-                               ]
-                        ),
-                        # Botón
-                        ft.FilledButton("Detalles", bgcolor=self.color_purple, expand=True,width=130)
-                    ], 
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,height=121
-                    )   
+                    aspect_ratio=1.5,
+                    bgcolor=self.container_color, 
+                    border_radius=10, 
+                    content=ft.Column(
+                        [
+                            ft.Container(
+                                content=ft.Image(
+                                    product['image'], 
+                                    width=page.window.width/3, 
+                                    fit=ft.ImageFit.COVER
+                                ), 
+                                expand=1
+                            ),
+                            ft.Container(
+                                padding=ft.padding.only(left=10, right=10, bottom=10), 
+                                content=ft.Column(
+                                    [
+                                        # Título del producto
+                                        ft.Text(
+
+                                            product['name'], 
+                                            color="white", 
+                                            weight="bold",
+                                            size=15,
+                                            text_align=ft.TextAlign.CENTER,
+                                            max_lines=2,
+                                            overflow=ft.TextOverflow.ELLIPSIS, 
+                                            expand=True, 
+                                        ),
+                                        # Precios
+                                        ft.Row(
+                                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                            controls=[
+                                                    ft.Text(f"Bs.{product['saleprice']}", color="white",text_align=ft.TextAlign.CENTER),
+                                                    ft.Text(f"Bs.{product['purchaseprice']}", color=self.color_purple,text_align=ft.TextAlign.CENTER),
+                                                ]
+                                        ),
+                                        # Botón
+                                        ft.FilledButton("Detalles", bgcolor=self.color_purple, expand=True,width=130)
+                                    ], 
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,height=121
+                                )   
+                            )
+                        ]
+                    )
                 )
-            ])))
+            )
         
         # --- Menú de Notificaciones Flotante ---
         self.notifications_popup = ft.Container(
@@ -295,6 +314,7 @@ class UIApp(ft.Container):
                                     content = ft.Column(
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                         controls=[
+                                            # 
                                             ft.Container(
                                                 height=195,
                                                 padding=ft.padding.all(0),
@@ -1199,6 +1219,9 @@ class UIApp(ft.Container):
             6: self.container_6
         }
 
+        # Cargar sesión y aplicar permisos basados en rol
+        self.apply_permissions()
+
         #Pagina: Distribuye la interfaz en dos partes
         self.content = ft.Row(
             expand=True,
@@ -1261,8 +1284,45 @@ class UIApp(ft.Container):
             # Actualiza la página para que se vea el movimiento
             self.page.update()
 
+    def apply_permissions(self):
+        """
+        Aplica los permisos según el rol del usuario.
+        Oculta o deshabilita las opciones de menú que el usuario no puede acceder.
+        """
+        try:
+            # Importar el SessionManager
+            import session
+            
+            # Verificar permisos para cada módulo y ocultar los no permitidos
+            if not session.session_manager.has_module_access(4):  # Módulo Empleados
+                self.option_4.visible = False
+            
+            if not session.session_manager.has_module_access(5):  # Módulo Balance
+                self.option_5.visible = False
+            
+            if not session.session_manager.has_module_access(6):  # Módulo Ajustes
+                self.option_6.visible = False
+            
+        except Exception as e:
+            print(f"Error al aplicar permisos: {e}")
+            # Si hay error, por seguridad ocultamos módulos sensibles
+            self.option_4.visible = False
+            self.option_5.visible = False
+            self.option_6.visible = False
+
     #Metodo para poder cambiar entre paginas y se vea la seleccion de boton
     def change_page(self, e, n):
+        # Verificar permisos antes de cambiar de página
+        try:
+            import session
+            if not session.session_manager.has_module_access(n):
+                # Si el usuario no tiene acceso, no hacer nada
+                print(f"Acceso denegado al módulo {n}")
+                return
+        except Exception as e:
+            print(f"Error al verificar permisos: {e}")
+            return
+
         #El for recorre las claves del diccionario (1, 2, 3, 4)
         for page in self.switch_control:
             self.switch_control[page].offset.y = 2

@@ -258,31 +258,31 @@ class UILogin(ft.Container):
 
         try:
             # Hacer petición a la API
-            response = requests.post(
-                url=f"{self.api_url}/login",
-                json={
-                    "user":username,
-                    "password":password
+            response = requests.post( # Envia una petición HTTP de tipo POST
+                url=f"{self.api_url}/login", # al endpoint /login del servidor self.api_url
+                json={                       # Envia user, password como datos JSON
+                    "user":username,         # en el cuerpo de la petición
+                    "password":password      # user y password no serán compartidos en data
                 },
-                timeout=5
+                timeout=5 # La conexión y la respuesta deben completarse en menos de 5 segundos
             )
 
             # Pasear respuesta
-            data = response.json()
+            data = response.json() # Intenta convertirlo en un diccionario Python
 
-            if data.get("success"):
-                user_data = data.get("user_data") # Login exitoso
+            if data.get("success"): # Si el servidor responde con un campo "success": True, el login fue exitoso
+                user_data = data.get("user_data") # recibe la información neceseria menos el user y password
                 self.save_session(user_data) # Guardar sesión
                 self.show_success_and_redirect(user_data) # Mostrar mensaje exitoso
             else:
                 self.show_loading(False) # Login fallido
                 self.show_error(data.get("message", "Error desconocido"))
         
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError: # No está corriendo el servidor local
             self.show_loading(False)
             self.show_error("No se pudo conectar al servidor. Asegúrate de que esté ejecutándose.")
         
-        except requests.exceptions.Timeout:
+        except requests.exceptions.Timeout: # No encontró 
             self.show_loading(False)
             self.show_error(f"Tiempo de espera agotado. Intenta nuevamente")
         
