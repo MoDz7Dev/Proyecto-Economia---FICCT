@@ -41,20 +41,23 @@ class UILogin(ft.Container):
         # ENTRADA DE USUARIO
         self.username_field = ft.TextField(
             label="Usuario",
-            prefix_icon=Icons.PERSON,
+            label_style=ft.TextStyle(color="white"),
+            prefix_icon=ft.Icon(Icons.PERSON, color="white"),
             width=350,
             height=60,
             border_color=self.color_blue,
             focused_border_color=self.color_purple,
             cursor_color=self.color_blue,
             text_size=16,
+            hint_style=ft.TextStyle(color="white"),
+            color="white",
             on_submit=lambda e: self.handle_login(e) #Enter para login
         )
 
         # ENTRADA DE CONTRASEÑA
         self.password_field = ft.TextField(
             label="Contraseña",
-            prefix_icon=Icons.LOCK,
+            prefix_icon=ft.Icon(Icons.LOCK, color="white"),
             password=True,
             can_reveal_password=True,
             width=350,
