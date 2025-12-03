@@ -13,7 +13,8 @@ def main(page: ft.Page):
                     route="/login",
                     controls=[UILogin(page)],
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    padding=0,
                 )
             )
 
@@ -23,7 +24,8 @@ def main(page: ft.Page):
                     route="/main",
                     controls=[UIApp(page)],
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    padding=0, bgcolor="#21324e"
                 )
             )
         page.update()
