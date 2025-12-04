@@ -4,6 +4,7 @@ from flet import Icons
 import flet_map as fmap
 import json
 import requests
+import employee_seccion as emp
 
 #Definimos la clase principal
 class UIApp(ft.Container):
@@ -1010,11 +1011,25 @@ class UIApp(ft.Container):
         )
         
         # --- Contenedor 4: Seccion Personal ---
+        self.employee_section_right = emp.EmployeeSectionRight()
+        self.employee_section_left = emp.EmployeeSectionLeft(
+            on_employee_select=lambda employee: self.employee_section_right.show_employee(employee)
+        )
+
         self.container_4 = ft.Container(
             expand=True,
             bgcolor= self.container_color,
             offset= ft.Offset(0,2),
-            animate_offset=self.animation_style
+            animate_offset=self.animation_style,
+            content=ft.Row(
+                # Secciones de empleados
+                controls=[
+                    self.employee_section_left,
+                    self.employee_section_right,
+                ],
+                expand=True,
+                spacing=5,
+            )
         )
 
         # --- Contenedor 5: Seccion Balance ---

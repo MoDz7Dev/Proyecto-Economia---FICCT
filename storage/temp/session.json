@@ -1,11 +1,11 @@
 {
-  "ci": 1006,
-  "user": "cajero1",
-  "email": "lucia.fernandez@hipermaxi.com",
-  "name": "Lucía Fernández",
-  "contact": "78899666",
+  "ci": 1001,
+  "user": "admin",
+  "email": "carlos.rodriguez@hipermaxi.com",
+  "name": "Carlos Rodríguez",
+  "contact": "78899111",
   "status": "active",
-  "role": "cashier",
-  "department": "Ventas",
-  "hire_date": "2022-06-20"
+  "role": "admin",
+  "department": "Gerencia",
+  "hire_date": "2020-01-15"
 }
