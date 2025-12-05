@@ -7,6 +7,8 @@ import requests
 import employee_seccion as emp
 import inventory_section as inv
 import balance as bal
+import buscar as bus
+import configuracion as cfg
 
 #Definimos la clase principal
 class UIApp(ft.Container):
@@ -647,7 +649,18 @@ class UIApp(ft.Container):
             expand=True,
             bgcolor= self.container_color,
             offset= ft.Offset(0,2),
-            animate_offset=self.animation_style
+            animate_offset=self.animation_style,
+            margin=5,
+            border_radius=10,
+            content=bus.BuscarSection(
+                page=self.page,
+                bg_color=self.bg_color,
+                card_color=self.container_color,
+                accent=self.color_purple,
+                accent_alt=self.color_blue,
+                card_accent_1=self.color1_card,
+                card_accent_2=self.color2_card
+            )
         )
         
         # --- Contenedor 3: Seccion Inventario ---
@@ -700,12 +713,23 @@ class UIApp(ft.Container):
             )
         )
 
-        # --- Contenedor 6: Seccion Ajustes (Por cambiar) ---
+        # --- Contenedor 6: Seccion Ajustes ---
         self.container_6 = ft.Container(
             expand=True,
-            bgcolor= self.container_color,
-            offset= ft.Offset(0,2),
-            animate_offset=self.animation_style
+            bgcolor=self.container_color,
+            offset=ft.Offset(0, 2),
+            animate_offset=self.animation_style,
+            margin=5,
+            border_radius=10,
+            content=cfg.ConfiguracionSection(
+                page=self.page,
+                bg_color=self.bg_color,
+                card_color=self.container_color,
+                accent=self.color_purple,
+                accent_alt=self.color_blue,
+                card_accent_1=self.color1_card,
+                card_accent_2=self.color2_card
+            )
         )
 
 
