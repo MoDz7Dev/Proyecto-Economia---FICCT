@@ -33,10 +33,10 @@ class EmployeeCard(ft.Container):
 
         # Estilos generales de la tarjeta
         self.width = 250
-        self.bgcolor = cfg.CONTAINER_COLOR
+        self.bgcolor = cfg.BG_COLOR
         self.padding = 12  # Padding reducido para dar más espacio al contenido
         self.border_radius = 10
-        self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
+        #self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
         self.ink = True  # Efecto de onda al hacer click
         # No establecemos altura fija, dejamos que se ajuste al contenido
 
@@ -207,7 +207,7 @@ class EmployeeSectionLeft(ft.Container):
         self.bgcolor = cfg.CONTAINER_COLOR
         self.padding = 15
         self.border_radius = 10
-        self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
+        #self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
 
     def filters_bar(self):
         """
@@ -402,7 +402,7 @@ class EmployeeSectionRight(ft.Container):
         self.bgcolor = cfg.CONTAINER_COLOR
         self.padding = 20
         self.border_radius = 10
-        self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
+        #self.border = ft.border.all(1, ft.Colors.with_opacity(0.2, ft.Colors.WHITE))
 
     def build_empty_content(self):
         """
@@ -433,6 +433,7 @@ class EmployeeSectionRight(ft.Container):
                             ),
                         ],
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        alignment=ft.MainAxisAlignment.CENTER,
                         spacing=10,
                     ),
                     alignment=ft.alignment.center,
