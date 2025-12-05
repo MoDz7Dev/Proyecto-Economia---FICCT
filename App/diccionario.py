@@ -5,126 +5,180 @@ products_data = [
         'name': "Jamon Sandwichero Sofia 1 kg",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img.png"
+        'image': "\products\img.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 2,
         'name': "Achocolatado Chocolike 1 kg",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img2.png"
+        'image': "\products\img2.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 3,
         'name': "Aceite Fino Light 4.5 L",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img3.png"
+        'image': "\products\img3.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 4,
         'name': "Te Windsor Canela 130 Sobres",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img4.png"
+        'image': "\products\img4.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 5,
         'name': "Azucar Guabira Blanca 1 kg",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img5.png"
+        'image': "\products\img5.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 6,
         'name': "Mayonesa Kris Limon 485 ml",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img7.png"
+        'image': "\products\img7.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 7,
         'name': "Ketchup Kris Original 200 gr",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img8.png"
+        'image': "\products\img8.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 8,
         'name': "Papel Higienico Nacional Clasico Celeste",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img6.png"
+        'image': "\products\img6.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 9,
         'name': "Lavavajilla Todo Brillo Limon Verde Doypack",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img9.png"
+        'image': "\products\img9.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 10,
         'name': "Detergente Polvo Omo Limon 4.8 kg",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img10.png"
+        'image': "\products\img10.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 11,
         'name': "Pinza Ropa Rey Gigante 24 un",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img11.png"
+        'image': "\products\img11.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 12,
         'name': "Lavandina Sapolio 1 L",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img12.png"
+        'image': "\products\img12.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 13,
         'name': "Lapices de Colores Faber Castell 12 Colores + 2 Lapices",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img13.png"
+        'image': "\products\img13.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 14,
         'name': "Cartulina Blanca Pliego",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img14.png"
+        'image': "\products\img14.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 15,
         'name': "Acrilex Opaco Surtido",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img15.png"
+        'image': "\products\img15.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 16,
         'name': "Cartulina Oficio 10 un",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img16.png"
+        'image': "\products\img16.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 17,
         'name': "Hoja Papel Bond Chamex Carta 500 Hojas",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img17.png"
+        'image': "\products\img17.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     },
     {
         'id': 18,
         'name': "Libro Infantil Lexus",
         'saleprice': 24.99,
         'purchaseprice': 24.99,
-        'image': "\products\img18.png"
+        'image': "\products\img18.png",
+        'category' : 'Carnes',
+        'stock' : '40',
+        'code' : '223041556'
     }
 ]
 
