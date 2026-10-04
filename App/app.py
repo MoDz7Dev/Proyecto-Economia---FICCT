@@ -15,7 +15,7 @@ def main(page: ft.Page):
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     padding=0,
-                )
+                )   
             )
 
         elif page.route == "/main":  # Página principal
@@ -26,6 +26,7 @@ def main(page: ft.Page):
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     padding=0, bgcolor="#21324e"
+                    
                 )
             )
         page.update()
@@ -33,4 +34,4 @@ def main(page: ft.Page):
     page.on_route_change = route_change
     page.go("/login")   # Abrir en la vista login
 
-ft.app(target=main, assets_dir="assets")
+ft.app(target=main, assets_dir="assets", view= ft.WEB_BROWSER, port=8080)
