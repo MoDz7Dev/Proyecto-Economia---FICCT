@@ -2,344 +2,122 @@ import flet as ft
 from flet import Icons
 import json
 import requests
-import config as cfg
 
-class ProductCard(ft.Container):
+from src import config as cfg
+from src.ui.components.product_card import ProductCard
+from src.ui.components.category_bar import CategoryBar
+from src.ui.components.shopping_cart import ShoppingCart
+from src.ui.components import chart_style
+
+def build_equilibrium_chart() -> ft.LineChart:
+    """Grafica de equilibrio de mercado (Oferta / Demanda).
+
+    Usa el estilo de "curvas luminosas" y rotula el final de cada curva con
+    "Demanda" y "Oferta".
     """
-    Tarjeta que muestra información básica de un producto.
-    Al hacer click en "Detalles", muestra la información completa en un diálogo.
-    """
-    def __init__(self, product: dict, page: ft.Page, on_add_to_cart=None, show_details_callback=None):
-        """
-        Args:
-            product (dict): Diccionario con los datos del producto
-            page (ft.Page): Referencia a la página principal
-            on_add_to_cart (callable): Función que se ejecuta al agregar al carrito
-            show_details_callback (callable): Callback para mostrar detalles
-        """
-        self.product = product
-        self.page = page
-        self.on_add_to_cart = on_add_to_cart
-        self.show_details_callback = show_details_callback
-        super().__init__()
+    # Oferta: Qs = -20 + Px      Demanda: Qd = 100 - 2Px
+    # Equilibrio: Pe = 40, Qe = 20
+    supply_points = []
+    demand_points = []
 
-        # Construcción del contenedor
-        self.content = self.build_content()
-
-        # Estilos generales de la tarjeta
-        self.aspect_ratio = 1.5
-        self.bgcolor = cfg.CONTAINER_COLOR
-        self.border_radius = 10
-
-    def build_content(self):
-        """
-        Construye el contenido de la tarjeta del producto
-        """
-        return ft.Column(
-            controls=[
-                ft.Container(
-                    content=ft.Image(
-                        self.product.get('image', ''), 
-                        width=200,
-                        fit=ft.ImageFit.COVER,
-                        error_content=ft.Icon(ft.Icons.IMAGE_NOT_SUPPORTED, size=100, color="white")
-                    ), 
-                    expand=1
-                ),
-                ft.Container(
-                    padding=ft.padding.only(left=10, right=10, bottom=10), 
-                    content=ft.Column(
-                        controls=[
-                            # Título del producto
-                            ft.Text(
-                                self.product.get('name', 'Sin nombre'), 
-                                color="white", 
-                                weight="bold",
-                                size=15,
-                                text_align=ft.TextAlign.CENTER,
-                                max_lines=2,
-                                overflow=ft.TextOverflow.ELLIPSIS, 
-                                expand=True, 
-                            ),
-                            # Precios
-                            ft.Row(
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                                controls=[
-                                    ft.Text(
-                                        f"Bs.{self.product.get('saleprice', '0.00')}", 
-                                        color="white",
-                                        text_align=ft.TextAlign.CENTER
-                                    ),
-                                    ft.Text(
-                                        f"Bs.{self.product.get('purchaseprice', '0.00')}", 
-                                        color=cfg.COLOR_PURPLE,
-                                        text_align=ft.TextAlign.CENTER
-                                    ),
-                                ]
-                            ),
-                            # Botón
-                            ft.FilledButton(
-                                "Detalles", 
-                                bgcolor=cfg.COLOR_PURPLE, 
-                                expand=True,
-                                width=130,
-                                on_click=self.handle_details_click
-                            )
-                        ], 
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        height=121
-                    )   
-                )
-            ]
-        )
-
-    def handle_details_click(self, e):
-        """
-        Maneja el clic en el botón de detalles
-        """
-        print(f"🖱️ CLICK DETECTADO en: {self.product.get('name', 'Sin nombre')}")
-        if self.show_details_callback:
-            print("✅ Ejecutando callback...")
-            self.show_details_callback(self.product)
-        else:
-            print("❌ No hay callback configurado")
-
-
-class CategoryBar(ft.Container):
-    """
-    Barra de navegación horizontal con categorías de productos
-    """
-    def __init__(self, on_category_change=None):
-        self.on_category_change = on_category_change
-        self.current_scroll_offset = 0
-        self.category_list_ref = ft.Ref[ft.ListView]()
-        
-        super().__init__()
-        
-        self.content = self.build_content()
-        
-        self.bgcolor = cfg.CONTAINER_COLOR
-        self.height = 50
-        self.border_radius = 15
-        self.padding = 5
-
-    def build_content(self):
-        categories = [
-            ("all", Icons.ALL_INBOX, "Todo"),
-            ("groceries", Icons.LOCAL_GROCERY_STORE, "Abarrotes"),
-            ("beverages", Icons.LOCAL_BAR, "Bebidas"),
-            ("meat", Icons.FASTFOOD, "Carnes"),
-            ("frozen", Icons.AC_UNIT, "Congelados"),
-            ("dairy", Icons.WATER_DROP, "Lácteos y Derivados"),
-            ("bakery", Icons.BAKERY_DINING, "Panadería"),
-            ("home_care", Icons.CLEANING_SERVICES, "Cuidado del Hogar"),
-            ("personal_care", Icons.WASH, "Cuidado Personal"),
-            ("toys", Icons.TOYS, "Juguetería"),
-            ("pharmacy", Icons.LOCAL_HOSPITAL, "Farmacia"),
-        ]
-        
-        category_buttons = []
-        for cat_id, icon, name in categories:
-            btn = ft.Container(
-                padding=10,
-                bgcolor=cfg.COLOR_NAVEGATION_BT,
-                border_radius=15,
-                on_click=lambda e, c=cat_id: self.handle_category_click(c),
-                height=40,
-                content=ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[
-                        ft.Icon(icon, color="white"),
-                        ft.Text(name, color="white")
-                    ]
-                )
+    for px in range(0, 70, 5):
+        # Línea de Oferta (verde): Qs = -20 + Px
+        qs = -20 + px
+        if qs >= 0:
+            supply_points.append(
+                ft.LineChartDataPoint(px, qs, tooltip=f"Oferta - Px: {px} / Qx: {qs}")
             )
-            category_buttons.append(btn)
-        
-        return ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
-            spacing=0,
-            controls=[
-                ft.IconButton(
-                    Icons.ARROW_BACK_IOS, 
-                    icon_color="white", 
-                    on_click=lambda e: self.scroll_categories(-100),
+
+        # Línea de Demanda (cyan): Qd = 100 - 2Px
+        qd = 100 - 2 * px
+        if qd >= 0:
+            demand_points.append(
+                ft.LineChartDataPoint(px, qd, tooltip=f"Demanda - Px: {px} / Qx: {qd}")
+            )
+
+    def axis_labels():
+        return [
+            ft.ChartAxisLabel(value=v, label=ft.Text(str(v), color="white", size=10))
+            for v in range(0, 71, 10)
+        ]
+
+    return ft.LineChart(
+        interactive=True,
+        bgcolor=chart_style.CHART_BG,
+        tooltip_bgcolor=ft.Colors.with_opacity(0.92, chart_style.CHART_BG),
+        tooltip_rounded_radius=8,
+        tooltip_padding=8,
+        point_line_start=0,
+        point_line_end=70,
+        data_series=[
+            # Línea de Demanda (Dx) - Cyan con degradado
+            ft.LineChartData(
+                data_points=demand_points,
+                color=chart_style.CYAN,
+                stroke_width=3,
+                stroke_cap_round=True,
+                curved=True,
+                shadow=chart_style.line_glow(chart_style.CYAN),
+                point=chart_style.dot(chart_style.CYAN),
+                selected_point=chart_style.glow_dot(chart_style.CYAN),
+                below_line_gradient=chart_style.fill_gradient(chart_style.CYAN, 0.28),
+            ),
+            # Línea de Oferta (Sx) - Verde con degradado
+            ft.LineChartData(
+                data_points=supply_points,
+                color=chart_style.GREEN,
+                stroke_width=3,
+                stroke_cap_round=True,
+                curved=True,
+                shadow=chart_style.line_glow(chart_style.GREEN),
+                point=chart_style.dot(chart_style.GREEN),
+                selected_point=chart_style.glow_dot(chart_style.GREEN),
+                below_line_gradient=chart_style.fill_gradient(chart_style.GREEN, 0.28),
+            ),
+            # Punto de Equilibrio (luminoso)
+            ft.LineChartData(
+                data_points=[
+                    ft.LineChartDataPoint(40, 20, tooltip="Equilibrio - Pe: 40 / Qe: 20")
+                ],
+                color=chart_style.RED,
+                stroke_width=0,
+                point=chart_style.glow_dot(chart_style.RED, radius=4.5, halo=8),
+                selected_point=chart_style.glow_dot(chart_style.RED, radius=4.5, halo=8),
+            ),
+        ],
+        min_x=0, max_x=70,
+        min_y=0, max_y=70,
+        border=chart_style.border_axes(),
+        horizontal_grid_lines=chart_style.grid_lines(interval=10),
+        vertical_grid_lines=chart_style.grid_lines(interval=10),
+        left_axis=ft.ChartAxis(
+            title=ft.Text("Cantidad (Qx)", color="white", size=11, weight="bold"),
+            title_size=30,
+            labels_size=25,
+            labels=axis_labels(),
+        ),
+        bottom_axis=ft.ChartAxis(
+            title=ft.Text("Precio (Px)", color="white", size=11, weight="bold"),
+            title_size=30,
+            labels_size=25,
+            labels=axis_labels(),
+        ),
+        # Etiquetas al final de cada curva
+        right_axis=ft.ChartAxis(
+            show_labels=True,
+            labels_size=58,
+            labels=[
+                ft.ChartAxisLabel(
+                    value=0,
+                    label=ft.Text("Demanda", color=chart_style.CYAN, size=10, weight="bold"),
                 ),
-                ft.Container(
-                    expand=True,
-                    clip_behavior=ft.ClipBehavior.HARD_EDGE,
-                    content=ft.ListView(
-                        ref=self.category_list_ref,
-                        horizontal=True,
-                        spacing=5,
-                        controls=category_buttons
-                    )
+                ft.ChartAxisLabel(
+                    value=45,
+                    label=ft.Text("Oferta", color=chart_style.GREEN, size=10, weight="bold"),
                 ),
-                ft.IconButton(
-                    Icons.ARROW_FORWARD_IOS, 
-                    icon_color="white", 
-                    on_click=lambda e: self.scroll_categories(100),
-                ),
-            ]
-        )
-
-    def scroll_categories(self, delta: int):
-        category_list = self.category_list_ref.current
-        
-        if category_list:
-            new_scroll = self.current_scroll_offset + delta
-            
-            if new_scroll < 0:
-                new_scroll = 0
-            
-            category_list.scroll_to(offset=new_scroll, duration=300)
-            self.current_scroll_offset = new_scroll
-            self.update()
-
-    def handle_category_click(self, category_id: str):
-        if self.on_category_change:
-            self.on_category_change(category_id)
-
-
-class ShoppingCart(ft.Container):
-    """
-    Panel del carrito de compras en el lado derecho
-    """
-    def __init__(self):
-        super().__init__()
-        
-        self.cart_items = []
-        self.cart_list_ref = ft.Ref[ft.ListView]()
-        self.total_text_ref = ft.Ref[ft.Text]()
-        
-        self.content = self.build_content()
-        
-        self.bgcolor = cfg.CONTAINER_COLOR
-        self.width = 300
-        self.border_radius = 15
-        self.padding = 10
-
-    def build_content(self):
-        return ft.Column(
-            controls=[
-                ft.Text("Factura N°: 3798247731223", color=ft.Colors.GREY_400),
-                ft.Divider(height=1),
-                ft.Row(
-                    controls=[
-                        ft.Image(src="Hipermaxi_logo.png", width=120, height=60, fit=ft.ImageFit.COVER),
-                        ft.Column(
-                            controls=[
-                                ft.Text("Hipermaxi", weight="bold", size=25, color="white"),
-                                ft.Text("hipermaxi@gmail.com", color=ft.Colors.GREY_400)
-                            ]
-                        )
-                    ]
-                ),
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                    controls=[
-                        ft.Text("Sucursal: Las Brisas", weight="bold", color=cfg.COLOR_PURPLE),
-                        ft.Text("Orden #23440", weight="bold", color="white")
-                    ],
-                ),
-                ft.Divider(height=1),
-                ft.ListView(
-                    ref=self.cart_list_ref,
-                    expand=True,
-                    controls=[
-                        ft.Column([
-                            ft.Row([
-                                ft.Image("products/img16.png", width=50, height=50),
-                                ft.Column([
-                                    ft.Text("Cartulina Oficio", color="white"),
-                                    ft.Text("Precio: Bs.38.00", color=cfg.COLOR_PURPLE)
-                                ]),
-                                ft.Text("Bs.114.00", color=cfg.COLOR_PURPLE, size=20, weight="bold")
-                            ]),
-                            ft.Row([
-                                ft.Row([
-                                    ft.IconButton(icon=ft.Icons.REMOVE, icon_color="white"),
-                                    ft.Container(
-                                        border_radius=3,
-                                        width=40,
-                                        height=25,
-                                        bgcolor=cfg.BG_COLOR,
-                                        content=ft.Row([
-                                            ft.Text(5, color="white")
-                                        ], alignment=ft.MainAxisAlignment.CENTER)
-                                    ),
-                                    ft.IconButton(icon=ft.Icons.ADD, icon_color="white")
-                                ]),
-                                ft.IconButton(icon=ft.Icons.DELETE, icon_color="white")
-                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                                         
-                        ]),
-                        ft.Divider(height=1),
-                        ft.Column([
-                            ft.Row([
-                                ft.Image("products/img13.png", width=50, height=50),
-                                ft.Column([
-                                    ft.Text("Lapices Faber Castell", color="white"),
-                                    ft.Text("Precio: Bs.10.00", color=cfg.COLOR_PURPLE)
-                                ]),
-                                ft.Text("Bs.40.00", color=cfg.COLOR_PURPLE, size=20, weight="bold")
-                            ]),
-                            ft.Row([
-                                ft.Row([
-                                    ft.IconButton(icon=ft.Icons.REMOVE, icon_color="white"),
-                                    ft.Container(
-                                        border_radius=3,
-                                        width=40,
-                                        height=25,
-                                        bgcolor=cfg.BG_COLOR,
-                                        content=ft.Row([
-                                            ft.Text(5, color="white")
-                                        ], alignment=ft.MainAxisAlignment.CENTER)
-                                    ),
-                                    ft.IconButton(icon=ft.Icons.ADD, icon_color="white")
-                                ]),
-                                ft.IconButton(icon=ft.Icons.DELETE, icon_color="white")
-                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                                         
-                        ]),
-                    ]
-                ),
-                ft.Container(
-                    padding=10,
-                    height=210,
-                    content=ft.Column(
-                        controls=[
-                            ft.Divider(height=1),
-                            ft.Row([
-                                ft.Column([
-                                    ft.Text("Total", weight="bold", color="white"),
-                                    ft.Text("Items: 3 Quanty: 6", color=ft.Colors.GREY_400)
-                                ]),
-                                ft.Text("67 Bs", size=30, weight="bold", color=cfg.COLOR_PURPLE)
-                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                            ft.CupertinoButton(
-                                "Imprimir Factura",
-                                bgcolor=cfg.COLOR_PURPLE,
-                                color=ft.Colors.WHITE,
-                                width=300
-                            ),
-                            ft.CupertinoButton(
-                                "Método de Pago",
-                                bgcolor=ft.Colors.GREEN_600,
-                                color=ft.Colors.WHITE,
-                                width=300
-                            ),
-                        ]
-                    )
-                )
-            ]
-        )
-
-    def add_product(self, product: dict):
-        self.cart_items.append(product)
-        self.update_cart_display()
-        print(f"🛒 Producto agregado al carrito: {product.get('name', 'Sin nombre')}")
-
-    def update_cart_display(self):
-        pass
+            ],
+        ),
+    )
 
 
 class InventorySection(ft.Container):
@@ -353,6 +131,7 @@ class InventorySection(ft.Container):
         self.category_bar = CategoryBar(on_category_change=self.filter_by_category)
         self.shopping_cart = ShoppingCart()
         self.products_grid_ref = ft.Ref[ft.GridView]()
+        self.empty_state_ref = ft.Ref[ft.Container]()
         self.all_products = self.get_products()
         self.filtered_products = self.all_products.copy()
         
@@ -384,9 +163,12 @@ class InventorySection(ft.Container):
         self.update_products_grid()
 
     def update_products_grid(self):
+        has_products = len(self.filtered_products) > 0
+
         if self.products_grid_ref.current:
-            self.products_grid_ref.current.controls.clear()
-            
+            grid = self.products_grid_ref.current
+            grid.controls.clear()
+
             for product in self.filtered_products:
                 card = ProductCard(
                     product=product,
@@ -394,9 +176,14 @@ class InventorySection(ft.Container):
                     on_add_to_cart=self.shopping_cart.add_product,
                     show_details_callback=self.show_product_details
                 )
-                self.products_grid_ref.current.controls.append(card)
-            
-            self.products_grid_ref.current.update()
+                grid.controls.append(card)
+
+            grid.visible = has_products
+            grid.update()
+
+        if self.empty_state_ref.current:
+            self.empty_state_ref.current.visible = not has_products
+            self.empty_state_ref.current.update()
 
     def show_product_details(self, product: dict):
         """
@@ -415,95 +202,8 @@ class InventorySection(ft.Container):
             self.page.update()
             print(f"🛒 Producto agregado: {product.get('name')}")
         
-        # Datos de equilibrio de mercado basados en la imagen
-        # Oferta: Qs = -20 + Px
-        # Demanda: Qd = 100 - 2Px
-        # Equilibrio: Pe = 40, Qe = 20
-        
-        # Generar puntos para la gráfica
-        supply_points = []
-        demand_points = []
-        
-        for px in range(0, 70, 5):
-            # Línea de Oferta (verde): Qs = -20 + Px
-            qs = -20 + px
-            if qs >= 0:
-                supply_points.append(ft.LineChartDataPoint(px, qs))
-            
-            # Línea de Demanda (cyan): Qd = 100 - 2Px
-            qd = 100 - 2 * px
-            if qd >= 0:
-                demand_points.append(ft.LineChartDataPoint(px, qd))
-        
-        # Crear gráfica de equilibrio de mercado
-        chart = ft.LineChart(
-            tooltip_bgcolor=ft.Colors.with_opacity(0.8, cfg.BG_COLOR),
-            data_series=[
-                # Línea de Demanda (Dx) - Cyan con relleno
-                ft.LineChartData(
-                    data_points=demand_points,
-                    color=ft.Colors.CYAN,
-                    stroke_width=3,
-                    curved=False,
-                    stroke_cap_round=True,
-                    below_line_bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.CYAN),
-                ),
-                # Línea de Oferta (Sx) - Verde con relleno
-                ft.LineChartData(
-                    data_points=supply_points,
-                    color=ft.Colors.GREEN,
-                    stroke_width=3,
-                    curved=False,
-                    stroke_cap_round=True,
-                    below_line_bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.GREEN),
-                ),
-                # Punto de Equilibrio
-                ft.LineChartData(
-                    data_points=[ft.LineChartDataPoint(40, 20)],
-                    color=ft.Colors.RED,
-                    stroke_width=0,
-                    point=True,
-                ),
-            ],
-            min_x=0,
-            max_x=70,
-            min_y=0,
-            max_y=70,
-            border=ft.Border(
-                bottom=ft.BorderSide(2, ft.Colors.with_opacity(0.5, ft.Colors.WHITE)),
-                left=ft.BorderSide(2, ft.Colors.with_opacity(0.5, ft.Colors.WHITE)),
-            ),
-            left_axis=ft.ChartAxis(
-                title=ft.Text("Cantidad (Qx)", color="white", size=11, weight="bold"),
-                title_size=30,
-                labels_size=25,
-                labels=[
-                    ft.ChartAxisLabel(value=0, label=ft.Text("0", color="white", size=10)),
-                    ft.ChartAxisLabel(value=10, label=ft.Text("10", color="white", size=10)),
-                    ft.ChartAxisLabel(value=20, label=ft.Text("20", color="white", size=10)),
-                    ft.ChartAxisLabel(value=30, label=ft.Text("30", color="white", size=10)),
-                    ft.ChartAxisLabel(value=40, label=ft.Text("40", color="white", size=10)),
-                    ft.ChartAxisLabel(value=50, label=ft.Text("50", color="white", size=10)),
-                    ft.ChartAxisLabel(value=60, label=ft.Text("60", color="white", size=10)),
-                    ft.ChartAxisLabel(value=70, label=ft.Text("70", color="white", size=10)),
-                ],
-            ),
-            bottom_axis=ft.ChartAxis(
-                title=ft.Text("Precio (Px)", color="white", size=11, weight="bold"),
-                title_size=30,
-                labels_size=25,
-                labels=[
-                    ft.ChartAxisLabel(value=0, label=ft.Text("0", color="white", size=10)),
-                    ft.ChartAxisLabel(value=10, label=ft.Text("10", color="white", size=10)),
-                    ft.ChartAxisLabel(value=20, label=ft.Text("20", color="white", size=10)),
-                    ft.ChartAxisLabel(value=30, label=ft.Text("30", color="white", size=10)),
-                    ft.ChartAxisLabel(value=40, label=ft.Text("40", color="white", size=10)),
-                    ft.ChartAxisLabel(value=50, label=ft.Text("50", color="white", size=10)),
-                    ft.ChartAxisLabel(value=60, label=ft.Text("60", color="white", size=10)),
-                    ft.ChartAxisLabel(value=70, label=ft.Text("70", color="white", size=10)),
-                ],
-            ),
-        )
+        # Grafica de Equilibrio de Mercado (estilo curvas luminosas)
+        chart = build_equilibrium_chart()
         
         # Crear el diálogo con nuevo diseño
         dlg = ft.AlertDialog(
@@ -640,7 +340,7 @@ class InventorySection(ft.Container):
                                                                                 spacing=3,
                                                                                 controls=[
                                                                                     ft.Container(width=15, height=3, bgcolor=ft.Colors.CYAN, border_radius=2),
-                                                                                    ft.Text("Dx", size=10, color=ft.Colors.CYAN),
+                                                                                    ft.Text("Demanda", size=10, color=ft.Colors.CYAN),
                                                                                 ]
                                                                             )
                                                                         ),
@@ -650,7 +350,7 @@ class InventorySection(ft.Container):
                                                                                 spacing=3,
                                                                                 controls=[
                                                                                     ft.Container(width=15, height=3, bgcolor=ft.Colors.GREEN, border_radius=2),
-                                                                                    ft.Text("Sx", size=10, color=ft.Colors.GREEN),
+                                                                                    ft.Text("Oferta", size=10, color=ft.Colors.GREEN),
                                                                                 ]
                                                                             )
                                                                         ),
@@ -789,6 +489,21 @@ class InventorySection(ft.Container):
             expand=1,
         )
         
+        empty_state = ft.Container(
+            ref=self.empty_state_ref,
+            expand=10,
+            visible=False,
+            alignment=ft.alignment.center,
+            content=ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=10,
+                controls=[
+                    ft.Icon(ft.Icons.SEARCH_OFF, size=60, color=ft.Colors.with_opacity(0.6, ft.Colors.WHITE)),
+                    ft.Text("No hay productos en esta categoría", color="white", size=16),
+                ],
+            ),
+        )
+
         return ft.Row(
             controls=[
                 ft.Container(
@@ -796,7 +511,8 @@ class InventorySection(ft.Container):
                     content=ft.Column(
                         controls=[
                             self.category_bar,
-                            products_grid
+                            products_grid,
+                            empty_state
                         ]
                     )
                 ),

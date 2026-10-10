@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from datetime import datetime
 from pydantic import BaseModel
-from diccionario import products_data, staff_users
+from src.data.diccionario import products_data, staff_users
 app = FastAPI()
 
 # ===== Modelo de datos para el cuerpo del login =====

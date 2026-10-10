@@ -1,6 +1,6 @@
 import flet as ft
-from login import UILogin
-from main import UIApp
+from src.ui.login import UILogin
+from src.ui.main_view import UIApp
 
 def main(page: ft.Page):
 
@@ -33,5 +33,3 @@ def main(page: ft.Page):
 
     page.on_route_change = route_change
     page.go("/login")   # Abrir en la vista login
-
-ft.app(target=main, assets_dir="assets", view= ft.WEB_BROWSER, port=8080)

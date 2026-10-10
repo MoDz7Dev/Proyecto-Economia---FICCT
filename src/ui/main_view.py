@@ -4,11 +4,87 @@ from flet import Icons
 import flet_map as fmap
 import json
 import requests
-import employee_seccion as emp
-import inventory_section as inv
-import balance as bal
-import buscar as bus
-import configuracion as cfg
+from src.ui.sections import employee_section as emp
+from src.ui.sections import inventory_section as inv
+from src.ui.sections import balance_section as bal
+from src.ui.sections import search_section as bus
+from src.ui.sections import settings_section as cfg
+from src.ui.components import chart_style
+
+# --- Grafica "Estado de Resultados" -----------------------------------------
+# 12 valores por linea: uno por cada mes del anio (Enero..Diciembre)
+RESULTS_GREEN = [1.2, 1.5, 2.0, 8, 3.2, 5, 2.0, 2.5, 5, 10, 2.1, 4]
+RESULTS_RED = [1.8, 8, 1.5, 7, 1.6, 1.8, 2.0, 10, 1.8, 3, 2.0, 2.2]
+RESULTS_BLUE = [3, 1.3, 2.8, 4, 3, 1, 4, 3, 5, 9, 3, 5.2]
+
+
+def build_results_chart() -> ft.LineChart:
+    """Construye la grafica de Estado de Resultados (Enero a Diciembre).
+
+    Usa el estilo de "curvas luminosas": trazo con brillo, degradado bajo la
+    curva, rejilla y un punto luminoso que se resalta al pasar el mouse.
+    """
+    months = chart_style.MONTHS
+    x_values = list(range(1, 13))
+
+    y_labels = [
+        ft.ChartAxisLabel(
+            value=value,
+            label=ft.Text(str(value), color=ft.Colors.WHITE, size=11)
+        )
+        for value in (0, 2.5, 5, 7.5, 10)
+    ]
+    x_labels = [
+        ft.ChartAxisLabel(
+            value=i,
+            label=ft.Text(name, color=ft.Colors.WHITE, size=10)
+        )
+        for i, name in enumerate(months, start=1)
+    ]
+
+    def serie(color, valores, etiqueta):
+        return ft.LineChartData(
+            data_points=[
+                ft.LineChartDataPoint(
+                    x, y,
+                    selected=(x == 8),
+                    tooltip=f"{months[x - 1]} - {etiqueta}: {y}",
+                )
+                for x, y in zip(x_values, valores)
+            ],
+            color=color,
+            stroke_width=3,
+            stroke_cap_round=True,
+            curved=True,
+            shadow=chart_style.line_glow(color),
+            point=chart_style.dot(color),
+            selected_point=chart_style.glow_dot(color),
+            below_line_gradient=chart_style.fill_gradient(color),
+        )
+
+    return ft.LineChart(
+        data_series=[
+            serie(chart_style.GREEN, RESULTS_GREEN, "Ingresos"),
+            serie(chart_style.RED, RESULTS_RED, "Costos"),
+            serie(chart_style.BLUE, RESULTS_BLUE, "Utilidad"),
+        ],
+        interactive=True,
+        bgcolor=chart_style.CHART_BG,
+        min_x=1, max_x=12,
+        min_y=0, max_y=10,
+        expand=True,
+        border=chart_style.border_axes(),
+        horizontal_grid_lines=chart_style.grid_lines(interval=2.5),
+        vertical_grid_lines=chart_style.grid_lines(interval=1),
+        tooltip_bgcolor=ft.Colors.with_opacity(0.92, chart_style.CHART_BG),
+        tooltip_rounded_radius=8,
+        tooltip_padding=8,
+        point_line_start=0,
+        point_line_end=10,
+        bottom_axis=ft.ChartAxis(labels_size=28, labels=x_labels, show_labels=True),
+        left_axis=ft.ChartAxis(labels_size=30, labels=y_labels, show_labels=True),
+    )
+
 
 #Definimos la clase principal
 class UIApp(ft.Container):
@@ -44,84 +120,10 @@ class UIApp(ft.Container):
         self.category_list_ref = ft.Ref[ft.ListView]()
         self.current_scroll_offset = 0
 
-        # -- Grafica: Curva de demanda y oferta --
-        x_values = list(range(1,16))
-        y_labels = [
-            ft.ChartAxisLabel(
-                value=0,
-                label=ft.Text("0", color=ft.Colors.WHITE, size=15)
-            ),
-            ft.ChartAxisLabel(
-                value=5,
-                label=ft.Text("5", color=ft.Colors.WHITE, size=15)
-            ),
-            ft.ChartAxisLabel(
-                value=10,
-                label=ft.Text("10", color=ft.Colors.WHITE, size=15)
-            ),
-        ]
-        x_labels = [
-            ft.ChartAxisLabel(
-                value=i,
-                label=ft.Text(str(i), color=ft.Colors.WHITE, size=15)
-            )
-            for i in range(1, 13, 1) # Genera 1, 4, 7, 10, 13
-        ]
-
-        #? Datos para graficar: Deben ser 12 para poder distribuirlos en los 12 Meses del
-        green_line = [1.2, 1.5, 2.0, 8, 3.2, 5, 2.0, 2.5, 5, 10, 2.1, 4]
-        red_line = [1.8, 8, 1.5, 7, 1.6, 1.8, 2.0, 10, 1.8, 3, 2.0, 2.2]
-        blue_line = [3, 1.3, 2.8, 4, 3, 1, 4, 3, 5, 9, 3, 5.2]
-
-        #!bottom_axis = ft.ChartAxis(labels_size=25, labels_interval=3, show_labels=True) -- Sirve pero no encuentro metodo para cambiar de color los numeros
-        bottom_axis = ft.ChartAxis(labels_size=25, labels=x_labels, show_labels=True)
-        left_axis = ft.ChartAxis(labels_size=25, labels=y_labels, show_labels=True)
-        
-
-
-        # --- Series de datos para la gráfica ---
-        self.green_line_data = ft.LineChartData(
-            data_points=[ft.LineChartDataPoint(x, y, selected=(x==8)) for x, y in zip(x_values, green_line)],
-            color="green",
-            stroke_width=1,
-            curved=True,
-            below_line_bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.GREEN),
-            visible=True
-        )
-        self.red_line_data = ft.LineChartData(
-            data_points=[ft.LineChartDataPoint(x, y, selected=(x==8)) for x, y in zip(x_values, red_line)],
-            color="red",
-            stroke_width=1,
-            curved=True,
-            below_line_bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.RED),
-            visible=True
-        )
-        self.blue_line_data = ft.LineChartData(
-            data_points=[ft.LineChartDataPoint(x, y, selected=(x==8)) for x, y in zip(x_values, blue_line)],
-            color="blue",
-            stroke_width=1,
-            curved=True,
-            below_line_bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.BLUE),
-            visible=True
-        )
-
-        self.char_data = ft.LineChart(
-            tooltip_bgcolor="transparent",
-            data_series=[
-                self.green_line_data,
-                self.red_line_data,
-                self.blue_line_data,
-            ],
-            #? Modifica El valor maximo  y minimo del eje "Y"
-            min_y=0, max_y=10,
-            expand=True,
-            border=ft.Border(
-                bottom=ft.BorderSide(1, ft.Colors.with_opacity(0.3, ft.Colors.WHITE)),
-                left=ft.BorderSide(1, ft.Colors.with_opacity(0.3, ft.Colors.WHITE)),
-            ),
-            bottom_axis=bottom_axis,
-            left_axis=left_axis
-        )
+        # -- Grafica: Estado de Resultados (Enero a Diciembre) --
+        self.char_data = build_results_chart()
+        # --- Series de datos de la grafica (las usa el menu de opciones) ---
+        self.green_line_data, self.red_line_data, self.blue_line_data = self.char_data.data_series
         
         # --- Menú de Notificaciones Flotante ---
         self.notifications_popup = ft.Container(
@@ -174,6 +176,39 @@ class UIApp(ft.Container):
             )
         )
 
+        # --- Menú de Usuario Flotante (resumen + cerrar sesión) ---
+        self.user_popup = ft.Container(
+            visible=False,
+            width=320,
+            padding=15,
+            bgcolor=self.bg_color,
+            border_radius=10,
+            shadow=ft.BoxShadow(
+                blur_radius=10,
+                color=ft.Colors.with_opacity(0.5, ft.Colors.BLACK),
+            ),
+            content=self._build_user_popup_content(),
+        )
+
+        # --- Busqueda global (barra superior) ---
+        self.global_search_ref = ft.Ref[ft.TextField]()
+        self.search_popup = ft.Container(
+            visible=False,
+            width=600,
+            padding=10,
+            bgcolor=self.bg_color,
+            border_radius=10,
+            shadow=ft.BoxShadow(
+                blur_radius=10,
+                color=ft.Colors.with_opacity(0.5, ft.Colors.BLACK),
+            ),
+            content=ft.Column(
+                spacing=4,
+                scroll=ft.ScrollMode.ADAPTIVE,
+                controls=[],
+            ),
+        )
+
         # --- Seccion Superior: Busqueda, Notificaciones, Usuario ---
         self.fixed_header = ft.Container( 
             height=60,
@@ -187,12 +222,15 @@ class UIApp(ft.Container):
                     border_radius=18,
                     bgcolor=self.container_color,
                     content=ft.TextField(
-                        hint_text="Buscar",
+                        ref=self.global_search_ref,
+                        hint_text="Buscar producto o empleado...",
                         border_radius=20,
                         border_color="transparent",
                         suffix_icon=ft.Icon(Icons.SEARCH, color="white"),
                         color="white",
                         hint_style=ft.TextStyle(color="white"),
+                        on_change=self.on_global_search,
+                        on_submit=self.on_global_search,
                     ),
                 ),
                 # --- Icono Notificaciones ---
@@ -234,6 +272,8 @@ class UIApp(ft.Container):
                     bgcolor=self.container_color,
                     border_radius=20,
                     width=50, height=50,
+                    alignment=ft.alignment.center,
+                    on_click=self.toggle_user_menu,
                     content=ft.Icon(Icons.PERSON_ROUNDED, color="white")
                 )
                 ],
@@ -497,42 +537,42 @@ class UIApp(ft.Container):
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="green"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.GREEN),
                                                                 ft.Text("Ingreso por ventas: 1,200,327.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="red"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.RED),
                                                                 ft.Text("Costo de ventas: 850,550.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="blue"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.BLUE),
                                                                 ft.Text("Utilidad Bruta: 423,250.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="orange"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.ORANGE),
                                                                 ft.Text("Gastos Operativos: 281,400.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="yellow"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.YELLOW),
                                                                 ft.Text("Utilidad Operativa: 100,933.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
                                                         ft.Row(
                                                             alignment=ft.MainAxisAlignment.START,
                                                             controls=[
-                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color="cyan"),
+                                                                ft.IconButton(ft.Icons.LINE_AXIS, icon_color=chart_style.CYAN),
                                                                 ft.Text("Utilidad Neta: 100,250.00 Bs", size=16, color="white"),
                                                             ]
                                                         ),
@@ -664,12 +704,13 @@ class UIApp(ft.Container):
         )
         
         # --- Contenedor 3: Seccion Inventario ---
+        self.inventory_section = inv.InventorySection(page=self.page)
         self.container_3 = ft.Container(
             expand=True,
             #bgcolor= self.container_color,
             offset= ft.Offset(0,2),
             animate_offset=self.animation_style, margin=5,
-            content=inv.InventorySection(page=self.page)
+            content=self.inventory_section
         )
         
         # --- Contenedor 4: Seccion Personal ---
@@ -763,9 +804,21 @@ class UIApp(ft.Container):
                     ),
                     # Contenedor del menú de notificaciones
                     ft.Container(
-                        top=60,  
-                        right=80, 
+                        top=60,
+                        right=80,
                         content=self.notifications_popup
+                    ),
+                    # Contenedor del resumen de usuario
+                    ft.Container(
+                        top=60,
+                        right=10,
+                        content=self.user_popup
+                    ),
+                    # Contenedor de resultados de búsqueda
+                    ft.Container(
+                        top=60,
+                        right=130,
+                        content=self.search_popup
                     )
                 ]
             )
@@ -953,11 +1006,230 @@ class UIApp(ft.Container):
     # Metodo para alternar la visibilidad del menú de notificaciones
     def toggle_notifications(self, e):
         self.notifications_popup.visible = not self.notifications_popup.visible
+        self.user_popup.visible = False  # cierra el resumen de usuario
+        self.search_popup.visible = False
         self.page.update()
 
     # Metodo para forzar el cierre del menú de notificaciones
     def hide_notifications(self, e):
         self.notifications_popup.visible = False
+        self.page.update()
+
+    # --- Resumen de usuario (boton de la barra superior) ---
+    def _get_current_user(self) -> dict:
+        """Devuelve los datos del usuario de la sesión actual (o {})."""
+        try:
+            from src.core import session
+            return session.session_manager.get_user_data() or {}
+        except Exception as ex:
+            print("No se pudo leer la sesión:", ex)
+            return {}
+
+    def _build_user_popup_content(self) -> ft.Column:
+        """Construye el resumen del usuario conectado."""
+        user = self._get_current_user()
+        name = user.get("name", "Usuario")
+        role_key = user.get("role", "")
+        role = emp.ROLE_NAMES.get(role_key, role_key.title() if role_key else "Sin rol")
+        initials = "".join(p[0] for p in name.split()[:2]).upper() if name else "?"
+
+        def info_row(icon, label, value):
+            return ft.Row(
+                spacing=10,
+                controls=[
+                    ft.Icon(icon, color=self.color_purple, size=18),
+                    ft.Column(
+                        spacing=0,
+                        controls=[
+                            ft.Text(label, size=10, color=ft.Colors.GREY),
+                            ft.Text(str(value), size=13, color="white"),
+                        ],
+                    ),
+                ],
+            )
+
+        return ft.Column(
+            spacing=12,
+            controls=[
+                ft.Row(
+                    spacing=12,
+                    controls=[
+                        ft.CircleAvatar(
+                            radius=26,
+                            bgcolor=self.color_purple,
+                            content=ft.Text(initials, color="white",
+                                            size=18, weight=ft.FontWeight.BOLD),
+                        ),
+                        ft.Column(
+                            spacing=2,
+                            expand=True,
+                            controls=[
+                                ft.Text(name, size=16, weight="bold", color="white"),
+                                ft.Text(role, size=12, color=ft.Colors.GREY),
+                            ],
+                        ),
+                    ],
+                ),
+                ft.Divider(height=1, color=ft.Colors.with_opacity(0.2, ft.Colors.WHITE)),
+                info_row(ft.Icons.BADGE, "Usuario", user.get("user", "-")),
+                info_row(ft.Icons.EMAIL, "Correo", user.get("email", "-")),
+                info_row(ft.Icons.BUSINESS, "Departamento", user.get("department", "-")),
+                info_row(ft.Icons.PHONE, "Contacto", user.get("contact", "-")),
+                info_row(ft.Icons.CREDIT_CARD, "CI", user.get("ci", "-")),
+                info_row(ft.Icons.CALENDAR_MONTH, "Fecha de ingreso", user.get("hire_date", "-")),
+                ft.Divider(height=1, color=ft.Colors.with_opacity(0.2, ft.Colors.WHITE)),
+                ft.ElevatedButton(
+                    "Cerrar sesión",
+                    icon=ft.Icons.LOGOUT,
+                    bgcolor=self.color1_card,
+                    color="white",
+                    width=280,
+                    height=44,
+                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)),
+                    on_click=self.logout,
+                ),
+            ],
+        )
+
+    def toggle_user_menu(self, e):
+        """Muestra/oculta el resumen de usuario (refrescando los datos)."""
+        self.user_popup.content = self._build_user_popup_content()
+        self.user_popup.visible = not self.user_popup.visible
+        self.notifications_popup.visible = False
+        self.search_popup.visible = False
+        self.page.update()
+
+    def hide_user_menu(self, e):
+        self.user_popup.visible = False
+        self.page.update()
+
+    def logout(self, e):
+        """Cierra la sesión y vuelve al login."""
+        try:
+            from src.core import session
+            session.session_manager.clear_session()
+        except Exception as ex:
+            print("Error al cerrar sesión:", ex)
+        self.user_popup.visible = False
+        print("Sesión cerrada")
+        self.page.go("/login")
+
+    # --- Busqueda global (barra superior) ---
+    def on_global_search(self, e):
+        """Muestra/oculta la lista de resultados al escribir en la barra."""
+        if self.global_search_ref.current is None:
+            return
+        query = (self.global_search_ref.current.value or "").strip().lower()
+        if not query:
+            self.search_popup.visible = False
+            self.page.update()
+            return
+
+        self.search_popup.content.controls = self._build_search_results(query)
+        self.search_popup.visible = True
+        # Cierra los otros menús flotantes
+        self.notifications_popup.visible = False
+        self.user_popup.visible = False
+        self.page.update()
+
+    def hide_search_popup(self, e):
+        self.search_popup.visible = False
+        self.page.update()
+
+    def _search_result_row(self, icon, title, subtitle, color, on_click):
+        """Fila clickeable de un resultado de búsqueda."""
+        return ft.Container(
+            padding=8,
+            border_radius=8,
+            ink=True,
+            on_click=on_click,
+            content=ft.Row(
+                spacing=10,
+                controls=[
+                    ft.Icon(icon, color=color, size=20),
+                    ft.Column(
+                        spacing=0,
+                        expand=True,
+                        controls=[
+                            ft.Text(title, size=13, color="white", max_lines=1,
+                                    overflow=ft.TextOverflow.ELLIPSIS),
+                            ft.Text(subtitle, size=11, color=ft.Colors.GREY),
+                        ],
+                    ),
+                    ft.Icon(ft.Icons.CHEVRON_RIGHT, color=ft.Colors.GREY, size=18),
+                ],
+            ),
+        )
+
+    def _build_search_results(self, query: str):
+        """Construye la lista de productos y empleados que coinciden."""
+        controls = []
+
+        products = [
+            p for p in getattr(self.inventory_section, "all_products", [])
+            if query in p.get("name", "").lower()
+            or query in str(p.get("category", "")).lower()
+            or query in str(p.get("code", "")).lower()
+        ][:5]
+
+        employees = [
+            e_ for e_ in getattr(self.employee_section_left, "all_employees", [])
+            if query in e_.get("name", "").lower()
+            or query in str(e_.get("user", "")).lower()
+            or query in str(e_.get("role", "")).lower()
+            or query in str(e_.get("department", "")).lower()
+        ][:5]
+
+        if products:
+            controls.append(ft.Text("Productos", size=12, weight="bold",
+                                    color=self.color_purple))
+            for p in products:
+                controls.append(self._search_result_row(
+                    ft.Icons.INVENTORY_2,
+                    p.get("name", "Producto"),
+                    f'{p.get("category", "")}  ·  Bs.{p.get("saleprice", "-")}',
+                    self.color_blue,
+                    lambda ev, prod=p: self._go_to_product(prod),
+                ))
+
+        if employees:
+            controls.append(ft.Text("Empleados", size=12, weight="bold",
+                                    color=self.color_purple))
+            for e_ in employees:
+                controls.append(self._search_result_row(
+                    ft.Icons.PERSON,
+                    e_.get("name", "Empleado"),
+                    f'{e_.get("department", "")}  ·  {e_.get("role", "")}',
+                    self.color1_card,
+                    lambda ev, empl=e_: self._go_to_employee(empl),
+                ))
+
+        if not controls:
+            controls.append(ft.Container(
+                padding=15,
+                content=ft.Text("Sin resultados para tu búsqueda",
+                                color=ft.Colors.GREY, size=13),
+            ))
+        return controls
+
+    def _go_to_product(self, product):
+        """Cierra la búsqueda, va a Inventario y abre el detalle del producto."""
+        self.search_popup.visible = False
+        if self.global_search_ref.current is not None:
+            self.global_search_ref.current.value = ""
+        self.change_page(None, 3)  # 3 = Inventario
+        if self.container_3.offset.y == 0:
+            self.inventory_section.show_product_details(product)
+        self.page.update()
+
+    def _go_to_employee(self, employee):
+        """Cierra la búsqueda, va a Empleados y muestra al empleado."""
+        self.search_popup.visible = False
+        if self.global_search_ref.current is not None:
+            self.global_search_ref.current.value = ""
+        self.change_page(None, 4)  # 4 = Empleados
+        if self.container_4.offset.y == 0:
+            self.employee_section_left.handle_employee_select(employee)
         self.page.update()
     
     # Metodo para desplazar las categorías horizontalmente
@@ -990,7 +1262,7 @@ class UIApp(ft.Container):
         """
         try:
             # Importar el SessionManager
-            import session
+            from src.core import session
             
             # Verificar permisos para cada módulo y ocultar los no permitidos
             if not session.session_manager.has_module_access(4):  # Módulo Empleados
@@ -1013,7 +1285,7 @@ class UIApp(ft.Container):
     def change_page(self, e, n):
         # Verificar permisos antes de cambiar de página
         try:
-            import session
+            from src.core import session
             if not session.session_manager.has_module_access(n):
                 # Si el usuario no tiene acceso, no hacer nada
                 print(f"Acceso denegado al módulo {n}")

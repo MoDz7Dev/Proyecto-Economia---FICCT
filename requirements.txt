@@ -1,0 +1,5 @@
+flet==0.28.3
+flet-map==0.1.0
+fastapi==0.142.2
+uvicorn==0.54.0
+requests==2.34.2

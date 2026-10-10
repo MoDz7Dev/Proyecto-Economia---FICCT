@@ -16,7 +16,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img2.png",
-        'category' : 'Carnes',
+        'category' : 'Abarrotes',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -26,7 +26,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img3.png",
-        'category' : 'Carnes',
+        'category' : 'Abarrotes',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -36,7 +36,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img4.png",
-        'category' : 'Carnes',
+        'category' : 'Bebidas',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -46,7 +46,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img5.png",
-        'category' : 'Carnes',
+        'category' : 'Abarrotes',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -56,7 +56,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img7.png",
-        'category' : 'Carnes',
+        'category' : 'Abarrotes',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -66,7 +66,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img8.png",
-        'category' : 'Carnes',
+        'category' : 'Abarrotes',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -76,7 +76,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img6.png",
-        'category' : 'Carnes',
+        'category' : 'Cuidado del Hogar',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -86,7 +86,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img9.png",
-        'category' : 'Carnes',
+        'category' : 'Cuidado del Hogar',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -96,7 +96,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img10.png",
-        'category' : 'Carnes',
+        'category' : 'Cuidado del Hogar',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -106,7 +106,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img11.png",
-        'category' : 'Carnes',
+        'category' : 'Cuidado del Hogar',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -116,7 +116,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img12.png",
-        'category' : 'Carnes',
+        'category' : 'Cuidado del Hogar',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -126,7 +126,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img13.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -136,7 +136,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img14.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -146,7 +146,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img15.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -156,7 +156,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img16.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -166,7 +166,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img17.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     },
@@ -176,7 +176,7 @@ products_data = [
         'saleprice': 24.99,
         'purchaseprice': 24.99,
         'image': "\products\img18.png",
-        'category' : 'Carnes',
+        'category' : 'Papelería',
         'stock' : '40',
         'code' : '223041556'
     }

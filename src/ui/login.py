@@ -295,7 +295,7 @@ class UILogin(ft.Container):
 
     def save_session(self, user_data: dict):
         try:
-            import session
+            from src.core import session
             session.save_session(user_data)
         except Exception as e:
             print(f"Error al guardar sesión: {e}")

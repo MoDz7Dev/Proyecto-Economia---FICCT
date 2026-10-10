@@ -1,6 +1,6 @@
 import flet as ft
-import config as cfg
-import diccionario as db
+from src import config as cfg
+from src.data import diccionario as db
 
 # Mapeo de roles a nombres en español para los filtros
 ROLE_NAMES = {
